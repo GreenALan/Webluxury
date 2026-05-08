@@ -1,0 +1,16 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: luxury-pg
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: luxury
+      POSTGRES_PASSWORD: luxury
+      POSTGRES_DB: luxury
+    ports:
+      - '5432:5432'
+    volumes:
+      - luxury-pg-data:/var/lib/postgresql/data
+
+volumes:
+  luxury-pg-data:
