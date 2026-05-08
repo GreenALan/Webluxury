@@ -14,10 +14,10 @@
 
 ### 1.1 用户画像
 
-| 角色 | 行为 |
-|---|---|
-| 访客（买家） | 手机为主（移动端 >70%），浏览商品列表、筛选品牌/分类/价格、查看详情、收藏、提交询价或扫微信二维码联系 |
-| 管理员（店主+助手） | 桌面为主，登录后台、上传/编辑商品、管理分类、查看询价、维护全站联系方式 |
+| 角色                | 行为                                                                                                  |
+| ------------------- | ----------------------------------------------------------------------------------------------------- |
+| 访客（买家）        | 手机为主（移动端 >70%），浏览商品列表、筛选品牌/分类/价格、查看详情、收藏、提交询价或扫微信二维码联系 |
+| 管理员（店主+助手） | 桌面为主，登录后台、上传/编辑商品、管理分类、查看询价、维护全站联系方式                               |
 
 ### 1.2 范围与边界
 
@@ -60,19 +60,19 @@
 
 ### 2.1 技术栈
 
-| 维度 | 选型 | 理由 |
-|---|---|---|
+| 维度        | 选型                                 | 理由                                |
+| ----------- | ------------------------------------ | ----------------------------------- |
 | 前端 + 后端 | Next.js 14 (App Router) + TypeScript | 单仓库全栈，SSR 利于 SEO 与移动首屏 |
-| 样式 | Tailwind CSS | 移动优先工程效率高 |
-| 数据库 | PostgreSQL（TencentDB） | 关系型查询/筛选适配商品+分类+询价 |
-| ORM | Prisma | 类型安全、迁移工具完善 |
-| 图片存储 | 腾讯云 COS + CDN | 直传节省服务器带宽 |
-| 认证 | JWT + bcrypt | 无第三方依赖、自建管理员体系足够 |
-| i18n | next-intl | 与 App Router 集成好 |
-| 部署 | 腾讯云 Lighthouse + Nginx + PM2 | 单店场景最经济（约 ¥30-50/月） |
-| 校验 | Zod | 与 TS 类型互通 |
-| 日志 | pino | 轻量、结构化 |
-| 测试 | Vitest + Playwright | 现代生态主流 |
+| 样式        | Tailwind CSS                         | 移动优先工程效率高                  |
+| 数据库      | PostgreSQL（TencentDB）              | 关系型查询/筛选适配商品+分类+询价   |
+| ORM         | Prisma                               | 类型安全、迁移工具完善              |
+| 图片存储    | 腾讯云 COS + CDN                     | 直传节省服务器带宽                  |
+| 认证        | JWT + bcrypt                         | 无第三方依赖、自建管理员体系足够    |
+| i18n        | next-intl                            | 与 App Router 集成好                |
+| 部署        | 腾讯云 Lighthouse + Nginx + PM2      | 单店场景最经济（约 ¥30-50/月）      |
+| 校验        | Zod                                  | 与 TS 类型互通                      |
+| 日志        | pino                                 | 轻量、结构化                        |
+| 测试        | Vitest + Playwright                  | 现代生态主流                        |
 
 ### 2.2 仓库结构
 
@@ -138,6 +138,7 @@ Setting (KV 表，存全站联系方式与品牌候选词等)
 ### 3.2 表定义
 
 **AdminUser**
+
 - `id` cuid, PK
 - `email` unique
 - `passwordHash` bcrypt cost 12
@@ -146,6 +147,7 @@ Setting (KV 表，存全站联系方式与品牌候选词等)
 - `createdAt`, `updatedAt`
 
 **Category**
+
 - `id` cuid
 - `slug` unique（URL 友好，如 `watch`）
 - `nameZh`, `nameEn`
@@ -153,6 +155,7 @@ Setting (KV 表，存全站联系方式与品牌候选词等)
 - `sortOrder` int
 
 **Product**
+
 - `id` cuid
 - `slug` unique
 - `titleZh`, `titleEn`（titleEn 可空，渲染时 fallback titleZh）
@@ -171,6 +174,7 @@ Setting (KV 表，存全站联系方式与品牌候选词等)
 - 复合索引：`(status, createdAt DESC)`、单列索引：`brand`、`categoryId`
 
 **Image**
+
 - `id` cuid
 - `productId` → Product (cascade)
 - `url`（COS 对象 key 或全 URL）
@@ -178,6 +182,7 @@ Setting (KV 表，存全站联系方式与品牌候选词等)
 - `sortOrder` int
 
 **Inquiry**
+
 - `id` cuid
 - `productId` → Product 可空（站点级询价时为空）
 - `name`
@@ -189,6 +194,7 @@ Setting (KV 表，存全站联系方式与品牌候选词等)
 - `createdAt`
 
 **Setting**（KV）
+
 - `key` PK（如 `contact_phone`、`contact_wechat_id`、`contact_wechat_qr_url`、`brand_options`）
 - `value` text/JSON
 - `updatedAt`
@@ -267,30 +273,30 @@ Setting (KV 表，存全站联系方式与品牌候选词等)
 
 ### 5.1 公开站点（移动优先）
 
-| 路径 | 页面 | 关键内容 |
-|---|---|---|
-| `/[locale]` | 首页 | Hero + 分类入口 + 最新上架横滚 + 全部商品入口 |
-| `/[locale]/products` | 列表 | 顶部筛选（移动抽屉/桌面侧栏）、网格、分页 |
-| `/[locale]/products/[slug]` | 详情 | 图片轮播、标题/品牌/价格/原价、成色徽章、双语描述、尺寸/编号、鉴定附件折叠区、询价 CTA、收藏 |
-| `/[locale]/favorites` | 收藏夹 | localStorage 读、批量询价 |
-| `/[locale]/about` | 关于 | 店主介绍、信任背书、联系方式 |
-| `/[locale]/contact` | 联系 | 全站联系方式 + 通用询价表单 |
+| 路径                        | 页面   | 关键内容                                                                                     |
+| --------------------------- | ------ | -------------------------------------------------------------------------------------------- |
+| `/[locale]`                 | 首页   | Hero + 分类入口 + 最新上架横滚 + 全部商品入口                                                |
+| `/[locale]/products`        | 列表   | 顶部筛选（移动抽屉/桌面侧栏）、网格、分页                                                    |
+| `/[locale]/products/[slug]` | 详情   | 图片轮播、标题/品牌/价格/原价、成色徽章、双语描述、尺寸/编号、鉴定附件折叠区、询价 CTA、收藏 |
+| `/[locale]/favorites`       | 收藏夹 | localStorage 读、批量询价                                                                    |
+| `/[locale]/about`           | 关于   | 店主介绍、信任背书、联系方式                                                                 |
+| `/[locale]/contact`         | 联系   | 全站联系方式 + 通用询价表单                                                                  |
 
 **全局组件**：`Header`、`Footer`、`MobileBottomBar`、`LanguageSwitch`、`LocaleLink`、`ProductCard`、`FilterDrawer` / `FilterSidebar`、`InquiryDialog`、`ImageGallery`、`ContactCard`、`Toast`
 
 ### 5.2 后台（响应式但桌面优先）
 
-| 路径 | 页面 | 关键内容 |
-|---|---|---|
-| `/admin/login` | 登录 | 邮箱+密码+错误次数限制 |
-| `/admin` | 仪表盘 | 在售数、本周询价数、最新询价 5 条 |
-| `/admin/products` | 商品列表 | 表格+状态筛选+搜索+排序 |
-| `/admin/products/new` | 新建 | 双语字段、图片上传、分类选择、默认 DRAFT |
-| `/admin/products/[id]/edit` | 编辑 | 图片可重排/删除/补传 |
-| `/admin/inquiries` | 询价 | 表格+已读/未读筛选+标记已读 |
-| `/admin/categories` | 分类 | 列表+排序拖拽+双语名 |
-| `/admin/settings` | 全站设置 | 联系方式、品牌候选词 |
-| `/admin/users` | 管理员管理 | 列表+邀请（一次性密码） |
+| 路径                        | 页面       | 关键内容                                 |
+| --------------------------- | ---------- | ---------------------------------------- |
+| `/admin/login`              | 登录       | 邮箱+密码+错误次数限制                   |
+| `/admin`                    | 仪表盘     | 在售数、本周询价数、最新询价 5 条        |
+| `/admin/products`           | 商品列表   | 表格+状态筛选+搜索+排序                  |
+| `/admin/products/new`       | 新建       | 双语字段、图片上传、分类选择、默认 DRAFT |
+| `/admin/products/[id]/edit` | 编辑       | 图片可重排/删除/补传                     |
+| `/admin/inquiries`          | 询价       | 表格+已读/未读筛选+标记已读              |
+| `/admin/categories`         | 分类       | 列表+排序拖拽+双语名                     |
+| `/admin/settings`           | 全站设置   | 联系方式、品牌候选词                     |
+| `/admin/users`              | 管理员管理 | 列表+邀请（一次性密码）                  |
 
 **后台组件**：`AdminLayout`、`ProductForm`（双语 Tab）、`ImageUploader`（拖拽+预览+进度+重排）、`RichTextarea`、`StatusBadge`、`Pagination`、`ConfirmDialog`
 
@@ -363,11 +369,11 @@ Setting (KV 表，存全站联系方式与品牌候选词等)
 
 ### 8.1 测试金字塔
 
-| 层 | 工具 | 覆盖 |
-|---|---|---|
-| 单元 | Vitest | `lib/` 纯函数：价格格式化、筛选条件构建、JWT、限流、Zod schema |
+| 层   | 工具             | 覆盖                                                                    |
+| ---- | ---------------- | ----------------------------------------------------------------------- |
+| 单元 | Vitest           | `lib/` 纯函数：价格格式化、筛选条件构建、JWT、限流、Zod schema          |
 | 集成 | Vitest + 测试 DB | API 路由：商品 CRUD、询价、登录、上传 URL 签发；Docker PG 或内存 SQLite |
-| E2E | Playwright | 5-8 条关键路径：访客浏览→筛选→询价、管理员登录→上传→前台可见 |
+| E2E  | Playwright       | 5-8 条关键路径：访客浏览→筛选→询价、管理员登录→上传→前台可见            |
 
 ### 8.2 不写
 
@@ -415,24 +421,24 @@ Setting (KV 表，存全站联系方式与品牌候选词等)
 
 ## 10. 里程碑
 
-| 阶段 | 范围 | 估时 |
-|---|---|---|
-| **M1：地基** | 脚手架、Prisma schema、i18n 框架、设计令牌、Header/Footer/MobileBottomBar、登录 + JWT 中间件 | ~1 周 |
+| 阶段                     | 范围                                                                                               | 估时    |
+| ------------------------ | -------------------------------------------------------------------------------------------------- | ------- |
+| **M1：地基**             | 脚手架、Prisma schema、i18n 框架、设计令牌、Header/Footer/MobileBottomBar、登录 + JWT 中间件       | ~1 周   |
 | **M2：商品 + 后台 CRUD** | 商品/分类/图片表 CRUD、ImageUploader、ProductForm、后台列表/编辑、Settings、Categories、Users 管理 | ~1.5 周 |
-| **M3：公开站点** | 首页、列表（FilterDrawer）、详情（ImageGallery）、收藏夹、关于、联系 | ~1.5 周 |
-| **M4：询价 + 上线** | InquiryDialog、`/api/inquiries`、限流、`/admin/inquiries`、E2E、备案完成、生产部署、SSL、CDN | ~1 周 |
+| **M3：公开站点**         | 首页、列表（FilterDrawer）、详情（ImageGallery）、收藏夹、关于、联系                               | ~1.5 周 |
+| **M4：询价 + 上线**      | InquiryDialog、`/api/inquiries`、限流、`/admin/inquiries`、E2E、备案完成、生产部署、SSL、CDN       | ~1 周   |
 
 **总计 ~5 周**（一人全职估算；备案串行卡时间）。
 
 ## 11. 一期不做但留下口子
 
-| 未来特性 | 留的扩展位 |
-|---|---|
-| 买家账号 | `AdminUser` 独立，未来加 `User` 表不冲突；`Inquiry` 可挂 `userId` |
-| 订单/支付 | `Product.status` 已有 `RESERVED/SOLD`；价格用 `Decimal` |
-| 评论/评分 | `Product` 有外键 ID，加 `Review` 表纯加法 |
+| 未来特性       | 留的扩展位                                                          |
+| -------------- | ------------------------------------------------------------------- |
+| 买家账号       | `AdminUser` 独立，未来加 `User` 表不冲突；`Inquiry` 可挂 `userId`   |
+| 订单/支付      | `Product.status` 已有 `RESERVED/SOLD`；价格用 `Decimal`             |
+| 评论/评分      | `Product` 有外键 ID，加 `Review` 表纯加法                           |
 | 询价站内信回复 | `Inquiry.status` 已留 `NEW/READ`，未来扩 `REPLIED` + `replies` 子表 |
-| 商品对比 | 纯前端功能，不影响后端 |
+| 商品对比       | 纯前端功能，不影响后端                                              |
 
 ## 12. 待解决的开放项
 

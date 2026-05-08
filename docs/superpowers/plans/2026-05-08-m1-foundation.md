@@ -94,6 +94,7 @@
 ## Task 1: 初始化 Next.js + TypeScript 工程
 
 **Files:**
+
 - Create: `package.json`, `tsconfig.json`, `next.config.mjs`, `.gitignore`, `src/app/layout.tsx`, `src/app/page.tsx`, `src/app/globals.css`
 
 - [ ] **Step 1: 用 pnpm 创建 Next.js 项目（手动）**
@@ -101,6 +102,7 @@
 由于目录非空（已有 `docs/`），不能用 `create-next-app`。手动初始化。
 
 Run:
+
 ```bash
 cd /Users/bytedance/Private/Web
 pnpm init
@@ -136,6 +138,7 @@ pnpm init
 - [ ] **Step 3: 安装核心依赖**
 
 Run:
+
 ```bash
 pnpm add next@14 react@18 react-dom@18
 pnpm add -D typescript @types/node @types/react @types/react-dom
@@ -230,6 +233,7 @@ test-results/
 - [ ] **Step 7: 创建最小可启动占位页面**
 
 `src/app/layout.tsx`:
+
 ```tsx
 import './globals.css';
 
@@ -248,6 +252,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 ```
 
 `src/app/page.tsx`:
+
 ```tsx
 export default function RootPage() {
   return <main>Bootstrapping…</main>;
@@ -255,16 +260,21 @@ export default function RootPage() {
 ```
 
 `src/app/globals.css`:
+
 ```css
-body { font-family: system-ui, sans-serif; }
+body {
+  font-family: system-ui, sans-serif;
+}
 ```
 
 - [ ] **Step 8: 验证启动**
 
 Run:
+
 ```bash
 pnpm dev
 ```
+
 打开 http://localhost:3000，看到 "Bootstrapping…"。Ctrl+C 停止。
 
 - [ ] **Step 9: Commit**
@@ -279,12 +289,14 @@ git commit -m "chore: initialize next.js project with typescript"
 ## Task 2: Tailwind CSS + 设计令牌
 
 **Files:**
+
 - Create: `tailwind.config.ts`, `postcss.config.mjs`
 - Modify: `src/app/globals.css`, `package.json`
 
 - [ ] **Step 1: 安装 Tailwind**
 
 Run:
+
 ```bash
 pnpm add -D tailwindcss postcss autoprefixer
 ```
@@ -295,10 +307,7 @@ pnpm add -D tailwindcss postcss autoprefixer
 import type { Config } from 'tailwindcss';
 
 const config: Config = {
-  content: [
-    './src/app/**/*.{ts,tsx}',
-    './src/components/**/*.{ts,tsx}'
-  ],
+  content: ['./src/app/**/*.{ts,tsx}', './src/components/**/*.{ts,tsx}'],
   theme: {
     extend: {
       colors: {
@@ -356,17 +365,22 @@ export default {
 @tailwind utilities;
 
 @layer base {
-  html { color-scheme: light; }
+  html {
+    color-scheme: light;
+  }
   body {
     @apply bg-bone text-ink antialiased;
   }
-  ::selection { @apply bg-ink text-bone; }
+  ::selection {
+    @apply bg-ink text-bone;
+  }
 }
 ```
 
 - [ ] **Step 5: 验证 Tailwind 生效**
 
 修改 `src/app/page.tsx`：
+
 ```tsx
 export default function RootPage() {
   return (
@@ -391,11 +405,13 @@ git commit -m "chore: add tailwind with luxury design tokens"
 ## Task 3: Google Fonts（next/font）
 
 **Files:**
+
 - Modify: `src/app/layout.tsx`
 
 - [ ] **Step 1: 引入 Inter（sans）+ Playfair Display（serif）**
 
 `src/app/layout.tsx`:
+
 ```tsx
 import './globals.css';
 import { Inter, Playfair_Display } from 'next/font/google';
@@ -442,6 +458,7 @@ git commit -m "chore: load inter + playfair via next/font"
 ## Task 4: ESLint + Prettier
 
 **Files:**
+
 - Create: `eslint.config.mjs`, `.prettierrc`, `.prettierignore`
 
 - [ ] **Step 1: 安装**
@@ -455,15 +472,15 @@ pnpm add -D eslint eslint-config-next prettier
 ```js
 import { FlatCompat } from '@eslint/eslintrc';
 const compat = new FlatCompat({ baseDirectory: import.meta.dirname });
-export default [
-  ...compat.extends('next/core-web-vitals', 'next/typescript')
-];
+export default [...compat.extends('next/core-web-vitals', 'next/typescript')];
 ```
 
 如果 FlatCompat 引入失败，回退 `.eslintrc.json`：
+
 ```json
 { "extends": ["next/core-web-vitals", "next/typescript"] }
 ```
+
 （Next.js 14 仍支持旧格式。）
 
 - [ ] **Step 3: 创建 `.prettierrc`**
@@ -497,6 +514,7 @@ coverage
 pnpm prettier --write .
 pnpm lint
 ```
+
 确认无错误。
 
 - [ ] **Step 6: Commit**
@@ -511,6 +529,7 @@ git commit -m "chore: configure eslint and prettier"
 ## Task 5: 环境变量
 
 **Files:**
+
 - Create: `.env.example`, `.env` (本地，不入 git)
 
 > **为什么用 `.env` 而非 `.env.local`**：Prisma CLI 默认只读 `.env`，Next.js 同时读 `.env` 和 `.env.local`。统一用 `.env` 可避免 `pnpm db:migrate` 找不到 `DATABASE_URL`。`.gitignore` 已排除 `.env`。
@@ -544,9 +563,11 @@ cp .env.example .env
 ```
 
 随机生成一个 JWT secret 并填入 `.env`：
+
 ```bash
 node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"
 ```
+
 把输出粘到 `.env` 的 `JWT_SECRET=` 后面。
 
 - [ ] **Step 3: 验证 `.gitignore` 排除 `.env`**
@@ -554,6 +575,7 @@ node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"
 ```bash
 git status
 ```
+
 `.env` 不应出现在 untracked 列表中（被 `.gitignore` 排除）。
 
 - [ ] **Step 4: Commit**
@@ -568,6 +590,7 @@ git commit -m "chore: add environment template"
 ## Task 6: Docker Compose 本地 PostgreSQL
 
 **Files:**
+
 - Create: `docker-compose.yml`
 
 - [ ] **Step 1: 创建 `docker-compose.yml`**
@@ -597,6 +620,7 @@ volumes:
 docker compose up -d
 docker exec luxury-pg pg_isready -U luxury
 ```
+
 应输出 `accepting connections`。
 
 - [ ] **Step 3: Commit**
@@ -611,6 +635,7 @@ git commit -m "chore: add docker compose for local postgres"
 ## Task 7: Prisma 初始化与 schema
 
 **Files:**
+
 - Create: `prisma/schema.prisma`
 
 - [ ] **Step 1: 安装 Prisma**
@@ -625,11 +650,13 @@ pnpm add @prisma/client
 ```bash
 pnpm prisma init --datasource-provider postgresql
 ```
+
 这会生成 `prisma/schema.prisma` 并尝试改 `.env`。如果 `prisma init` 在 `.env` 末尾追加了重复 `DATABASE_URL`，删掉新加的那行（保留 Task 5 创建的）。
 
 - [ ] **Step 3: 编写完整 schema**
 
 `prisma/schema.prisma`:
+
 ```prisma
 generator client {
   provider = "prisma-client-js"
@@ -763,9 +790,11 @@ model Setting {
 ```bash
 pnpm db:migrate -- --name init
 ```
+
 （脚本里的 `db:migrate` 是 `prisma migrate dev`。）
 
 如果命令报错 `--` 解析问题，直接：
+
 ```bash
 pnpm prisma migrate dev --name init
 ```
@@ -777,6 +806,7 @@ pnpm prisma migrate dev --name init
 ```bash
 docker exec luxury-pg psql -U luxury -d luxury -c "\dt"
 ```
+
 应看到 8 张表（外加 `_prisma_migrations`）。
 
 - [ ] **Step 6: Commit**
@@ -791,6 +821,7 @@ git commit -m "feat(db): add prisma schema and initial migration"
 ## Task 8: Prisma Client 单例
 
 **Files:**
+
 - Create: `src/lib/prisma.ts`
 
 - [ ] **Step 1: 创建单例**
@@ -818,6 +849,7 @@ if (process.env.NODE_ENV !== 'production') {
 ```bash
 pnpm typecheck
 ```
+
 应通过。
 
 - [ ] **Step 3: Commit**
@@ -832,6 +864,7 @@ git commit -m "feat: add prisma client singleton"
 ## Task 9: pino 日志
 
 **Files:**
+
 - Create: `src/lib/logger.ts`
 
 - [ ] **Step 1: 安装**
@@ -875,6 +908,7 @@ git commit -m "feat: add pino logger"
 ## Task 10: 安装 Vitest 并写第一个测试（rate-limit）
 
 **Files:**
+
 - Create: `vitest.config.ts`, `src/lib/rate-limit.ts`, `tests/lib/rate-limit.test.ts`
 
 - [ ] **Step 1: 安装**
@@ -907,6 +941,7 @@ export default defineConfig({
 - [ ] **Step 3: 写测试（先失败）**
 
 `tests/lib/rate-limit.test.ts`:
+
 ```ts
 import { describe, it, expect, beforeEach } from 'vitest';
 import { RateLimiter } from '@/lib/rate-limit';
@@ -954,11 +989,13 @@ describe('RateLimiter', () => {
 ```bash
 pnpm test
 ```
+
 应报错：`Cannot find module '@/lib/rate-limit'`。
 
 - [ ] **Step 5: 实现 rate-limit**
 
 `src/lib/rate-limit.ts`:
+
 ```ts
 type Bucket = { count: number; resetAt: number };
 
@@ -998,6 +1035,7 @@ export const loginLimiter = new RateLimiter({ windowMs: 15 * 60_000, max: 5 });
 ```bash
 pnpm test
 ```
+
 4 passed。
 
 - [ ] **Step 7: Commit**
@@ -1012,6 +1050,7 @@ git commit -m "feat: add in-memory rate limiter"
 ## Task 11: 认证工具（bcrypt + JWT）
 
 **Files:**
+
 - Create: `src/lib/auth.ts`, `tests/lib/auth.test.ts`
 
 - [ ] **Step 1: 安装**
@@ -1026,6 +1065,7 @@ pnpm add -D @types/bcryptjs
 - [ ] **Step 2: 写测试**
 
 `tests/lib/auth.test.ts`:
+
 ```ts
 import { describe, it, expect, beforeEach } from 'vitest';
 import { hashPassword, verifyPassword, signSession, verifySession } from '@/lib/auth';
@@ -1083,6 +1123,7 @@ pnpm test tests/lib/auth.test.ts
 - [ ] **Step 4: 实现 auth**
 
 `src/lib/auth.ts`:
+
 ```ts
 import bcrypt from 'bcryptjs';
 import { SignJWT, jwtVerify } from 'jose';
@@ -1138,6 +1179,7 @@ export const SESSION_COOKIE = 'lr_session';
 ```bash
 pnpm test tests/lib/auth.test.ts
 ```
+
 6 passed。
 
 - [ ] **Step 6: Commit**
@@ -1152,11 +1194,13 @@ git commit -m "feat: add jwt + bcrypt auth utilities"
 ## Task 12: Seed 脚本（创建初始 OWNER）
 
 **Files:**
+
 - Create: `prisma/seed.ts`
 
 - [ ] **Step 1: 编写 seed**
 
 `prisma/seed.ts`:
+
 ```ts
 import { PrismaClient, Role } from '@prisma/client';
 import { hashPassword } from '../src/lib/auth';
@@ -1216,6 +1260,7 @@ main()
 ```bash
 pnpm db:seed
 ```
+
 应输出临时密码（记下来，下面登录测试要用）。
 
 - [ ] **Step 4: 验证数据库**
@@ -1223,6 +1268,7 @@ pnpm db:seed
 ```bash
 docker exec luxury-pg psql -U luxury -d luxury -c "SELECT email, role FROM \"AdminUser\";"
 ```
+
 应看到 owner@example.com / OWNER。
 
 - [ ] **Step 5: Commit**
@@ -1237,6 +1283,7 @@ git commit -m "feat(db): add seed script for initial owner"
 ## Task 13: Zod 安装（为登录 API 准备）
 
 **Files:**
+
 - 仅修改 `package.json`
 
 - [ ] **Step 1: 安装**
@@ -1257,6 +1304,7 @@ git commit -m "chore: add zod"
 ## Task 14: i18n 配置（next-intl）
 
 **Files:**
+
 - Create: `src/i18n/config.ts`, `src/i18n/request.ts`, `messages/zh.json`, `messages/en.json`
 - Modify: `next.config.mjs`
 
@@ -1269,6 +1317,7 @@ pnpm add next-intl
 - [ ] **Step 2: 创建 locales 配置**
 
 `src/i18n/config.ts`:
+
 ```ts
 export const locales = ['zh', 'en'] as const;
 export type Locale = (typeof locales)[number];
@@ -1278,6 +1327,7 @@ export const defaultLocale: Locale = 'zh';
 - [ ] **Step 3: 创建 messages**
 
 `messages/zh.json`:
+
 ```json
 {
   "site": {
@@ -1308,6 +1358,7 @@ export const defaultLocale: Locale = 'zh';
 ```
 
 `messages/en.json`:
+
 ```json
 {
   "site": {
@@ -1340,6 +1391,7 @@ export const defaultLocale: Locale = 'zh';
 - [ ] **Step 4: 创建 next-intl 请求配置**
 
 `src/i18n/request.ts`:
+
 ```ts
 import { getRequestConfig } from 'next-intl/server';
 import { locales, defaultLocale, type Locale } from './config';
@@ -1387,11 +1439,13 @@ git commit -m "chore(i18n): configure next-intl with zh/en messages"
 ## Task 15: middleware（i18n + 鉴权骨架）
 
 **Files:**
+
 - Create: `src/middleware.ts`
 
 - [ ] **Step 1: 创建 middleware**
 
 `src/middleware.ts`:
+
 ```ts
 import createIntlMiddleware from 'next-intl/middleware';
 import { NextRequest, NextResponse } from 'next/server';
@@ -1480,6 +1534,7 @@ git commit -m "feat: add i18n + auth middleware with security headers"
 ## Task 16: 公开站点 [locale] 路由 + 占位首页
 
 **Files:**
+
 - Create: `src/app/[locale]/layout.tsx`, `src/app/[locale]/page.tsx`
 - Delete: `src/app/page.tsx`（被根路由 → /zh 替代）
 - Modify: `src/app/layout.tsx`
@@ -1497,6 +1552,7 @@ rm src/app/page.tsx
 - [ ] **Step 3: 创建 locale layout**
 
 `src/app/[locale]/layout.tsx`:
+
 ```tsx
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages, setRequestLocale } from 'next-intl/server';
@@ -1536,6 +1592,7 @@ export default async function LocaleLayout({
 - [ ] **Step 4: 创建 locale 首页占位**
 
 `src/app/[locale]/page.tsx`:
+
 ```tsx
 import { useTranslations } from 'next-intl';
 
@@ -1553,18 +1610,27 @@ export default function HomePage() {
 - [ ] **Step 5: 创建占位组件（避免 import 报错，下个 Task 实现真内容）**
 
 `src/components/public/Header.tsx`:
+
 ```tsx
-export function Header() { return <header className="h-14 border-b border-line" />; }
+export function Header() {
+  return <header className="h-14 border-b border-line" />;
+}
 ```
 
 `src/components/public/Footer.tsx`:
+
 ```tsx
-export function Footer() { return <footer className="h-14 border-t border-line" />; }
+export function Footer() {
+  return <footer className="h-14 border-t border-line" />;
+}
 ```
 
 `src/components/public/MobileBottomBar.tsx`:
+
 ```tsx
-export function MobileBottomBar() { return null; }
+export function MobileBottomBar() {
+  return null;
+}
 ```
 
 - [ ] **Step 6: 验证**
@@ -1572,6 +1638,7 @@ export function MobileBottomBar() { return null; }
 ```bash
 pnpm dev
 ```
+
 - 访问 http://localhost:3000 → 应自动重定向到 /zh
 - 看到中文 "二手奢侈品 / 精选二手奢品"
 - 访问 /en → 显示英文
@@ -1588,6 +1655,7 @@ git commit -m "feat: add [locale] route with home placeholder"
 ## Task 17: LanguageSwitch 组件
 
 **Files:**
+
 - Create: `src/components/public/LanguageSwitch.tsx`
 
 - [ ] **Step 1: 创建组件**
@@ -1642,6 +1710,7 @@ git commit -m "feat(public): add LanguageSwitch"
 ## Task 18: Header 组件
 
 **Files:**
+
 - Modify: `src/components/public/Header.tsx`
 
 - [ ] **Step 1: 实现 Header**
@@ -1691,6 +1760,7 @@ git commit -m "feat(public): implement Header"
 ## Task 19: Footer 组件
 
 **Files:**
+
 - Modify: `src/components/public/Footer.tsx`
 
 - [ ] **Step 1: 实现 Footer**
@@ -1732,6 +1802,7 @@ git commit -m "feat(public): implement Footer"
 ## Task 20: MobileBottomBar 组件
 
 **Files:**
+
 - Modify: `src/components/public/MobileBottomBar.tsx`
 
 - [ ] **Step 1: 实现**
@@ -1795,11 +1866,13 @@ git commit -m "feat(public): implement MobileBottomBar"
 ## Task 21: 登录 API（POST /api/admin/login）
 
 **Files:**
+
 - Create: `src/app/api/admin/login/route.ts`, `tests/api/admin-login.test.ts`
 
 - [ ] **Step 1: 写集成测试（先失败）**
 
 `tests/api/admin-login.test.ts`:
+
 ```ts
 import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
 import { PrismaClient, Role } from '@prisma/client';
@@ -1877,6 +1950,7 @@ pnpm test tests/api/admin-login.test.ts
 - [ ] **Step 3: 实现 route**
 
 `src/app/api/admin/login/route.ts`:
+
 ```ts
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
@@ -1940,6 +2014,7 @@ export async function POST(req: Request) {
 ```bash
 pnpm test
 ```
+
 全部 passed（auth 6 + rate-limit 4 + login 4 = 14）。
 
 - [ ] **Step 5: Commit**
@@ -1954,11 +2029,13 @@ git commit -m "feat(admin): add login api with rate limit"
 ## Task 22: 登录页
 
 **Files:**
+
 - Create: `src/app/admin/layout.tsx`（先用最小布局）, `src/app/admin/login/page.tsx`
 
 - [ ] **Step 1: 创建最小 admin layout（不用国际化）**
 
 `src/app/admin/layout.tsx`:
+
 ```tsx
 import './admin.css';
 
@@ -1968,13 +2045,17 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 ```
 
 `src/app/admin/admin.css`:
+
 ```css
-.admin-root { font-family: var(--font-sans), system-ui, sans-serif; }
+.admin-root {
+  font-family: var(--font-sans), system-ui, sans-serif;
+}
 ```
 
 - [ ] **Step 2: 创建登录页**
 
 `src/app/admin/login/page.tsx`:
+
 ```tsx
 'use client';
 import { useState, type FormEvent } from 'react';
@@ -1999,9 +2080,7 @@ export default function AdminLoginPage() {
       });
       const json = await res.json();
       if (!res.ok) {
-        setError(
-          json.code === 'RATE_LIMITED' ? '失败次数过多，请稍后再试' : '邮箱或密码错误'
-        );
+        setError(json.code === 'RATE_LIMITED' ? '失败次数过多，请稍后再试' : '邮箱或密码错误');
         return;
       }
       router.push('/admin');
@@ -2066,12 +2145,14 @@ git commit -m "feat(admin): add login page"
 ## Task 23: 仪表盘占位 + 登出
 
 **Files:**
+
 - Create: `src/app/admin/page.tsx`, `src/app/api/admin/logout/route.ts`
 - Modify: `src/app/admin/layout.tsx`
 
 - [ ] **Step 1: 增强 AdminLayout（侧栏 + 顶栏）**
 
 `src/app/admin/layout.tsx`:
+
 ```tsx
 import './admin.css';
 import Link from 'next/link';
@@ -2104,12 +2185,24 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         <aside className="w-56 border-r border-line p-6 hidden md:block">
           <div className="font-serif text-lg mb-8">后台</div>
           <nav className="space-y-2 text-sm">
-            <Link href="/admin" className="block py-1.5">仪表盘</Link>
-            <Link href="/admin/products" className="block py-1.5 text-ink-soft">商品</Link>
-            <Link href="/admin/inquiries" className="block py-1.5 text-ink-soft">询价</Link>
-            <Link href="/admin/categories" className="block py-1.5 text-ink-soft">分类</Link>
-            <Link href="/admin/users" className="block py-1.5 text-ink-soft">管理员</Link>
-            <Link href="/admin/settings" className="block py-1.5 text-ink-soft">设置</Link>
+            <Link href="/admin" className="block py-1.5">
+              仪表盘
+            </Link>
+            <Link href="/admin/products" className="block py-1.5 text-ink-soft">
+              商品
+            </Link>
+            <Link href="/admin/inquiries" className="block py-1.5 text-ink-soft">
+              询价
+            </Link>
+            <Link href="/admin/categories" className="block py-1.5 text-ink-soft">
+              分类
+            </Link>
+            <Link href="/admin/users" className="block py-1.5 text-ink-soft">
+              管理员
+            </Link>
+            <Link href="/admin/settings" className="block py-1.5 text-ink-soft">
+              设置
+            </Link>
           </nav>
           <form action="/api/admin/logout" method="post" className="mt-12">
             <button className="text-xs text-ink-soft hover:text-ink">登出</button>
@@ -2132,6 +2225,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 - [ ] **Step 2: 创建 dashboard 占位**
 
 `src/app/admin/page.tsx`:
+
 ```tsx
 export default function AdminDashboardPage() {
   return (
@@ -2146,6 +2240,7 @@ export default function AdminDashboardPage() {
 - [ ] **Step 3: 创建 logout API**
 
 `src/app/api/admin/logout/route.ts`:
+
 ```ts
 import { NextResponse } from 'next/server';
 import { SESSION_COOKIE } from '@/lib/auth';
@@ -2189,6 +2284,7 @@ git commit -m "feat(admin): add dashboard placeholder + logout"
 ## Task 24: Playwright + 登录 E2E
 
 **Files:**
+
 - Create: `playwright.config.ts`, `tests/e2e/admin-login.spec.ts`
 
 - [ ] **Step 1: 安装 Playwright**
@@ -2201,6 +2297,7 @@ pnpm exec playwright install chromium
 - [ ] **Step 2: 创建配置**
 
 `playwright.config.ts`:
+
 ```ts
 import { defineConfig, devices } from '@playwright/test';
 
@@ -2229,6 +2326,7 @@ export default defineConfig({
 - [ ] **Step 3: 写 E2E**
 
 `tests/e2e/admin-login.spec.ts`:
+
 ```ts
 import { test, expect } from '@playwright/test';
 import { PrismaClient, Role } from '@prisma/client';
@@ -2284,6 +2382,7 @@ test('错误密码显示错误信息', async ({ page }) => {
 ```bash
 pnpm e2e
 ```
+
 3 passed。
 
 - [ ] **Step 5: Commit**
@@ -2298,12 +2397,14 @@ git commit -m "test(e2e): admin login flow"
 ## Task 25: README + 收尾
 
 **Files:**
+
 - Create: `README.md`
 
 - [ ] **Step 1: 写 README**
 
 `README.md`:
-```markdown
+
+````markdown
 # Luxury Resale
 
 二手奢侈品展示网站。Phase 1 = 单店主目录 + 后台登录。
@@ -2329,36 +2430,39 @@ pnpm db:seed
 # 5. 启动
 pnpm dev
 ```
+````
 
 公开站点：http://localhost:3000/zh
 后台：http://localhost:3000/admin
 
 ## 命令
 
-| 命令 | 说明 |
-|---|---|
-| `pnpm dev` | 启动开发服 |
-| `pnpm build` | 生产构建 |
-| `pnpm test` | 跑单元/集成测试 |
-| `pnpm e2e` | 跑 E2E 测试 |
-| `pnpm typecheck` | TS 类型检查 |
-| `pnpm lint` | ESLint |
-| `pnpm db:dev` | 启动本地 PG |
-| `pnpm db:migrate` | 跑 Prisma 迁移 |
-| `pnpm db:seed` | 种初始管理员 |
-| `pnpm db:studio` | 打开 Prisma Studio |
+| 命令              | 说明               |
+| ----------------- | ------------------ |
+| `pnpm dev`        | 启动开发服         |
+| `pnpm build`      | 生产构建           |
+| `pnpm test`       | 跑单元/集成测试    |
+| `pnpm e2e`        | 跑 E2E 测试        |
+| `pnpm typecheck`  | TS 类型检查        |
+| `pnpm lint`       | ESLint             |
+| `pnpm db:dev`     | 启动本地 PG        |
+| `pnpm db:migrate` | 跑 Prisma 迁移     |
+| `pnpm db:seed`    | 种初始管理员       |
+| `pnpm db:studio`  | 打开 Prisma Studio |
 
 ## 文档
 
 - 设计：`docs/superpowers/specs/2026-05-08-secondhand-luxury-site-design.md`
 - 实施计划：`docs/superpowers/plans/`
-```
+
+````
 
 - [ ] **Step 2: 全量验证**
 
 ```bash
 pnpm typecheck && pnpm lint && pnpm test && pnpm e2e
-```
+````
+
 全绿。
 
 - [ ] **Step 3: Commit**
@@ -2385,7 +2489,7 @@ git commit -m "docs: add readme"
 
 ## 自审备注
 
-- **占位符扫描**：无 TBD/TODO；M2 用到的 COS_* env 已在 `.env.example` 占位
+- **占位符扫描**：无 TBD/TODO；M2 用到的 COS\_\* env 已在 `.env.example` 占位
 - **类型一致性**：`SessionPayload`、`SESSION_COOKIE`、Prisma 枚举 `Role` 在 auth/middleware/login API 中名称一致
 - **覆盖**：spec §6 错误处理（统一错误码 + Zod 校验 + Prisma 错误隔离）已在登录 API 落地；§7 安全（bcrypt cost 12、httpOnly cookie、登录限流、CSP/X-Frame-Options 等）全部覆盖；§5 全局组件 Header/Footer/MobileBottomBar/LanguageSwitch 落地；§4.4 语言切换流程通畅
 - **明确不在 M1**：CSP 的 Content-Security-Policy 头延后到 M4 部署前——M1 中的 SECURITY_HEADERS 仅含基本头（X-Frame、HSTS 等），CSP 写完整后会涉及 next/font、next/image 域，更适合在 M4 联调

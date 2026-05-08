@@ -3,9 +3,13 @@
 @tailwind utilities;
 
 @layer base {
-  html { color-scheme: light; }
+  html {
+    color-scheme: light;
+  }
   body {
     @apply bg-bone text-ink antialiased;
   }
-  ::selection { @apply bg-ink text-bone; }
+  ::selection {
+    @apply bg-ink text-bone;
+  }
 }
