@@ -1,0 +1,35 @@
+# deps
+node_modules/
+
+# next
+.next/
+out/
+
+# env
+.env
+.env.local
+.env*.local
+
+# logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# os
+.DS_Store
+
+# editor
+.vscode/
+.idea/
+
+# build artifacts
+*.tsbuildinfo
+next-env.d.ts
+
+# test
+coverage/
+playwright-report/
+test-results/
+
+# prisma
+/prisma/migrations/dev.db*
