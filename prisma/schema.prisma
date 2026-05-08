@@ -1,0 +1,125 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  OWNER
+  ADMIN
+}
+
+enum Condition {
+  NEW
+  LIKE_NEW
+  EXCELLENT
+  GOOD
+  FAIR
+}
+
+enum ProductStatus {
+  DRAFT
+  AVAILABLE
+  RESERVED
+  SOLD
+  ARCHIVED
+}
+
+enum ImageKind {
+  PHOTO
+  CERT
+}
+
+enum InquiryStatus {
+  NEW
+  READ
+  REPLIED
+}
+
+model AdminUser {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  passwordHash String
+  name         String
+  role         Role      @default(ADMIN)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  products     Product[]
+}
+
+model Category {
+  id        String    @id @default(cuid())
+  slug      String    @unique
+  nameZh    String
+  nameEn    String
+  icon      String?
+  sortOrder Int       @default(0)
+  products  Product[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Product {
+  id            String        @id @default(cuid())
+  slug          String        @unique
+  titleZh       String
+  titleEn       String?
+  descZh        String?       @db.Text
+  descEn        String?       @db.Text
+  brand         String
+  categoryId    String
+  category      Category      @relation(fields: [categoryId], references: [id])
+  price         Decimal       @db.Decimal(10, 2)
+  originalPrice Decimal?      @db.Decimal(10, 2)
+  currency      String        @default("CNY")
+  condition     Condition
+  sizeInfo      Json?
+  serialNumber  String?
+  status        ProductStatus @default(DRAFT)
+  uploadedById  String
+  uploadedBy    AdminUser     @relation(fields: [uploadedById], references: [id])
+  images        Image[]
+  inquiries     Inquiry[]
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  soldAt        DateTime?
+
+  @@index([status, createdAt(sort: Desc)])
+  @@index([brand])
+  @@index([categoryId])
+}
+
+model Image {
+  id        String    @id @default(cuid())
+  productId String
+  product   Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  url       String
+  kind      ImageKind @default(PHOTO)
+  sortOrder Int       @default(0)
+
+  @@index([productId])
+}
+
+model Inquiry {
+  id        String        @id @default(cuid())
+  productId String?
+  product   Product?      @relation(fields: [productId], references: [id], onDelete: SetNull)
+  name      String
+  contact   String
+  message   String        @db.Text
+  locale    String
+  status    InquiryStatus @default(NEW)
+  ipHash    String
+  createdAt DateTime      @default(now())
+
+  @@index([status, createdAt(sort: Desc)])
+}
+
+model Setting {
+  key       String   @id
+  value     String   @db.Text
+  updatedAt DateTime @updatedAt
+}
