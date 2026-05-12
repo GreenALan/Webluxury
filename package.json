@@ -22,12 +22,15 @@
   "packageManager": "pnpm@10.25.0",
   "dependencies": {
     "@prisma/client": "^6.19.3",
+    "bcryptjs": "^3.0.3",
+    "jose": "^6.2.3",
     "next": "^14.2.35",
     "pino": "^10.3.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },
   "devDependencies": {
+    "@types/bcryptjs": "^3.0.0",
     "@types/node": "^22.19.18",
     "@types/react": "^18.3.28",
     "@types/react-dom": "^18.3.7",
