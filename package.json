@@ -20,6 +20,9 @@
     "node": ">=20.0.0"
   },
   "packageManager": "pnpm@10.25.0",
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
+  },
   "dependencies": {
     "@prisma/client": "^6.19.3",
     "bcryptjs": "^3.0.3",
