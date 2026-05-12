@@ -1,0 +1,26 @@
+{
+  "site": {
+    "name": "Luxury Resale",
+    "tagline": "Curated pre-owned luxury"
+  },
+  "nav": {
+    "home": "Home",
+    "products": "Shop",
+    "favorites": "Favorites",
+    "about": "About",
+    "contact": "Contact"
+  },
+  "language": "Language",
+  "footer": {
+    "copyright": "© 2026 Luxury Resale. All rights reserved."
+  },
+  "admin": {
+    "loginTitle": "Admin Login",
+    "email": "Email",
+    "password": "Password",
+    "submit": "Sign in",
+    "errorInvalid": "Wrong email or password",
+    "errorLocked": "Too many attempts, try again later",
+    "dashboard": "Dashboard"
+  }
+}
