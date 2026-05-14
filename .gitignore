@@ -34,3 +34,6 @@ test-results/
 # prisma
 /prisma/migrations/dev.db*
 *.mbtiles
+
+# user uploads (local dev only; M4 switches to COS)
+/public/uploads/
