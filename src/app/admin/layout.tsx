@@ -1,8 +1,8 @@
 import './admin.css';
-import Link from 'next/link';
 import { cookies } from 'next/headers';
 import { verifySession, SESSION_COOKIE } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
+import { AdminSidebar } from '@/components/admin/AdminSidebar';
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const cookieStore = await cookies();
@@ -21,26 +21,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
       {user && (
         <aside className="w-56 border-r border-line p-6 hidden md:block">
           <div className="font-serif text-lg mb-8">后台</div>
-          <nav className="space-y-2 text-sm">
-            <Link href="/admin" className="block py-1.5">
-              仪表盘
-            </Link>
-            <Link href="/admin/products" className="block py-1.5 text-ink-soft">
-              商品
-            </Link>
-            <Link href="/admin/inquiries" className="block py-1.5 text-ink-soft">
-              询价
-            </Link>
-            <Link href="/admin/categories" className="block py-1.5 text-ink-soft">
-              分类
-            </Link>
-            <Link href="/admin/users" className="block py-1.5 text-ink-soft">
-              管理员
-            </Link>
-            <Link href="/admin/settings" className="block py-1.5 text-ink-soft">
-              设置
-            </Link>
-          </nav>
+          <AdminSidebar />
           <form action="/api/admin/logout" method="post" className="mt-12">
             <button className="text-xs text-ink-soft hover:text-ink">登出</button>
           </form>

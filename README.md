@@ -1,6 +1,9 @@
 # Luxury Resale
 
-二手奢侈品展示网站。Phase 1 = 单店主目录 + 后台登录。
+二手奢侈品展示网站。
+
+**M1**：脚手架 + 双语 i18n + 移动端为主的公开站点骨架 + 后台登录 + JWT 鉴权。
+**M2**：后台完整 CRUD（商品/分类/Settings/Users + 图片上传）。
 
 ## 本地开发
 
@@ -33,7 +36,7 @@ pnpm dev
 |---|---|
 | `pnpm dev` | 启动开发服 |
 | `pnpm build` | 生产构建 |
-| `pnpm test` | 跑单元/集成测试 |
+| `pnpm test` | 跑单元/集成测试（需要 DB） |
 | `pnpm e2e` | 跑 E2E 测试（需要 DB） |
 | `pnpm typecheck` | TS 类型检查 |
 | `pnpm lint` | ESLint |
@@ -47,12 +50,7 @@ pnpm dev
 - 设计：`docs/superpowers/specs/2026-05-08-secondhand-luxury-site-design.md`
 - 实施计划：`docs/superpowers/plans/`
 
-## M1 待完成的环境步骤
+## 注意
 
-Docker 未安装时跳过了以下步骤，安装 Docker Desktop 后补：
-
-1. `pnpm db:dev` 启动 PG
-2. `pnpm db:migrate` 生成首次迁移（`prisma/migrations/<时间戳>_init/`）
-3. `pnpm db:seed` 创建 OWNER 账号
-4. 启用 `tests/api/admin-login.test.ts` 的集成测：`DATABASE_URL_TEST_ENABLED=1 pnpm test`
-5. `pnpm exec playwright install chromium && pnpm e2e` 跑端到端
+- 本地图片上传到 `public/uploads/`（已 gitignored）。M4 部署时换为腾讯云 COS。
+- `.env` 必须存在且含有效 `DATABASE_URL` 和 `JWT_SECRET`。Prisma CLI 默认只读 `.env`（不读 `.env.local`）。
