@@ -45,3 +45,10 @@ export async function verifySession(token: string): Promise<SessionPayload | nul
 }
 
 export const SESSION_COOKIE = 'lr_session';
+
+export async function readSessionFromRequest(req: Request): Promise<SessionPayload | null> {
+  const cookie = req.headers.get('cookie') ?? '';
+  const m = cookie.match(new RegExp(`(?:^|; )${SESSION_COOKIE}=([^;]+)`));
+  if (!m) return null;
+  return verifySession(decodeURIComponent(m[1]));
+}
