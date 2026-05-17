@@ -91,6 +91,19 @@ describe('GET /api/products', () => {
     expect(json.items).toEqual([]);
   });
 
+  it('?ids=a,a 去重，结果只出现一次', async () => {
+    const res = await GET(req(`/api/products?ids=${availId},${availId},${availId}`));
+    const json = await res.json();
+    expect(json.items).toHaveLength(1);
+    expect(json.items[0].id).toBe(availId);
+  });
+
+  it('?ids=,,, 只含逗号也返回 []', async () => {
+    const res = await GET(req('/api/products?ids=,,,'));
+    const json = await res.json();
+    expect(json.items).toEqual([]);
+  });
+
   it('支持 category slug 过滤', async () => {
     const res = await GET(req('/api/products?category=pubapi-cat-w'));
     const json = await res.json();
@@ -102,5 +115,12 @@ describe('GET /api/products', () => {
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json.page).toBe(1);
+  });
+
+  it('序列化 null 字段为 JSON null', async () => {
+    const res = await GET(req(`/api/products?ids=${availId}`));
+    const json = await res.json();
+    expect(json.items[0].titleEn).toBeNull();
+    expect(json.items[0].originalPrice).toBeNull();
   });
 });

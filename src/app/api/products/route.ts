@@ -1,6 +1,11 @@
 import { NextResponse } from 'next/server';
 import { listPublicProducts, getPublicProductsByIds } from '@/lib/products';
 
+export const runtime = 'nodejs';
+
+const PUBLIC_PAGE_SIZE = 12;
+const MAX_IDS_PER_REQUEST = 100;
+
 function toPosInt(v: string | null, fallback: number): number {
   if (!v) return fallback;
   const n = Number(v);
@@ -46,32 +51,43 @@ function serialize(p: {
 }
 
 export async function GET(req: Request) {
-  const url = new URL(req.url);
-  const idsParam = url.searchParams.get('ids');
-  if (idsParam !== null) {
-    const ids = idsParam
-      .split(',')
-      .map((s) => s.trim())
-      .filter(Boolean);
-    const rows = await getPublicProductsByIds(ids);
-    return NextResponse.json({ ok: true, items: rows.map(serialize) });
-  }
+  try {
+    const url = new URL(req.url);
+    const idsParam = url.searchParams.get('ids');
+    if (idsParam !== null) {
+      const ids = Array.from(
+        new Set(
+          idsParam
+            .split(',')
+            .map((s) => s.trim())
+            .filter(Boolean)
+        )
+      ).slice(0, MAX_IDS_PER_REQUEST);
+      const rows = await getPublicProductsByIds(ids);
+      return NextResponse.json({ ok: true, items: rows.map(serialize) });
+    }
 
-  const page = toPosInt(url.searchParams.get('page'), 1);
-  const pageSize = toPosInt(url.searchParams.get('pageSize'), 12);
-  const result = await listPublicProducts({
-    categorySlug: url.searchParams.get('category') ?? undefined,
-    brand: url.searchParams.get('brand') ?? undefined,
-    minPrice: toNonNegNumber(url.searchParams.get('minPrice')),
-    maxPrice: toNonNegNumber(url.searchParams.get('maxPrice')),
-    page,
-    pageSize
-  });
-  return NextResponse.json({
-    ok: true,
-    items: result.items.map(serialize),
-    total: result.total,
-    page: result.page,
-    pageSize: result.pageSize
-  });
+    const page = toPosInt(url.searchParams.get('page'), 1);
+    const result = await listPublicProducts({
+      categorySlug: url.searchParams.get('category') ?? undefined,
+      brand: url.searchParams.get('brand') ?? undefined,
+      minPrice: toNonNegNumber(url.searchParams.get('minPrice')),
+      maxPrice: toNonNegNumber(url.searchParams.get('maxPrice')),
+      page,
+      pageSize: PUBLIC_PAGE_SIZE
+    });
+    return NextResponse.json({
+      ok: true,
+      items: result.items.map(serialize),
+      total: result.total,
+      page: result.page,
+      pageSize: result.pageSize
+    });
+  } catch (err) {
+    console.error('GET /api/products error', err);
+    return NextResponse.json(
+      { ok: false, code: 'INTERNAL_ERROR' },
+      { status: 500 }
+    );
+  }
 }
