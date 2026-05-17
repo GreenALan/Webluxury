@@ -1,11 +1,33 @@
-import { useTranslations } from 'next-intl';
+import { setRequestLocale } from 'next-intl/server';
+import { getFacets, listLatestPublic } from '@/lib/products';
+import { HomeHero } from '@/components/public/HomeHero';
+import { CategoryGrid } from '@/components/public/CategoryGrid';
+import { LatestStrip } from '@/components/public/LatestStrip';
+import type { Locale } from '@/i18n/config';
 
-export default function HomePage() {
-  const t = useTranslations('site');
+export default async function HomePage({
+  params
+}: {
+  params: Promise<{ locale: Locale }>;
+}) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+  const [facets, latest] = await Promise.all([getFacets(), listLatestPublic(8)]);
   return (
-    <section className="container mx-auto px-4 py-24 text-center">
-      <h1 className="font-serif text-5xl tracking-wider">{t('name')}</h1>
-      <p className="mt-4 text-ink-soft">{t('tagline')}</p>
-    </section>
+    <>
+      <HomeHero />
+      <CategoryGrid categories={facets.categories} />
+      <LatestStrip
+        items={latest.map((p) => ({
+          slug: p.slug,
+          titleZh: p.titleZh,
+          titleEn: p.titleEn,
+          brand: p.brand,
+          price: p.price.toString(),
+          originalPrice: p.originalPrice?.toString() ?? null,
+          image: p.images[0]?.url ?? null
+        }))}
+      />
+    </>
   );
 }
