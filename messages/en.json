@@ -22,5 +22,77 @@
     "errorInvalid": "Wrong email or password",
     "errorLocked": "Too many attempts, try again later",
     "dashboard": "Dashboard"
+  },
+  "public": {
+    "home": {
+      "heroTitle": "Curated pre-owned luxury",
+      "heroSub": "Authenticated, trusted, negotiable.",
+      "browseAll": "Browse all",
+      "latest": "New arrivals",
+      "categories": "Categories",
+      "viewAll": "View all"
+    },
+    "list": {
+      "title": "All products",
+      "empty": "Nothing in stock right now.",
+      "filter": "Filter",
+      "apply": "Apply",
+      "reset": "Reset",
+      "category": "Category",
+      "brand": "Brand",
+      "anyCategory": "Any",
+      "anyBrand": "Any",
+      "minPrice": "Min price",
+      "maxPrice": "Max price",
+      "showing": "{total} items",
+      "page": "Page {page} of {pages}"
+    },
+    "detail": {
+      "backToList": "Back to list",
+      "brand": "Brand",
+      "condition": "Condition",
+      "serial": "Serial",
+      "size": "Size",
+      "originalPrice": "Original",
+      "soldNote": "If this item is unavailable, contact us for current status.",
+      "inquireCTA": "Inquire",
+      "favorite": "Save",
+      "unfavorite": "Saved",
+      "certs": "Authentication docs",
+      "descTitle": "Description",
+      "noDesc": "No description."
+    },
+    "favorites": {
+      "title": "My favorites",
+      "empty": "You haven't saved anything yet.",
+      "clearAll": "Clear all",
+      "removed": "Some saved items are no longer available and were removed."
+    },
+    "about": {
+      "title": "About",
+      "intro": "We are a studio specialising in pre-owned luxury, every piece vetted by senior authenticators.",
+      "trustTitle": "Why us",
+      "trust": [
+        "Authenticated: every item ships with an authentication record",
+        "Negotiable: transparent pricing, happy to discuss",
+        "Traceable: clear provenance, after-sales support"
+      ]
+    },
+    "contact": {
+      "title": "Contact",
+      "subtitle": "Reach out through any of the channels below.",
+      "phone": "Phone",
+      "wechat": "WeChat ID",
+      "wechatQr": "WeChat QR",
+      "noContact": "Contact details not yet configured.",
+      "formNote": "Online inquiries are coming soon. For now, please reach out via the channels above."
+    },
+    "condition": {
+      "NEW": "New",
+      "LIKE_NEW": "Like New",
+      "EXCELLENT": "Excellent",
+      "GOOD": "Good",
+      "FAIR": "Fair"
+    }
   }
 }

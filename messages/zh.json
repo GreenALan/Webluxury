@@ -22,5 +22,77 @@
     "errorInvalid": "邮箱或密码错误",
     "errorLocked": "失败次数过多，请稍后再试",
     "dashboard": "仪表盘"
+  },
+  "public": {
+    "home": {
+      "heroTitle": "精选二手奢品",
+      "heroSub": "经验证、可信赖、可议价。",
+      "browseAll": "浏览全部",
+      "latest": "最新上架",
+      "categories": "分类",
+      "viewAll": "查看全部"
+    },
+    "list": {
+      "title": "全部商品",
+      "empty": "暂无在售商品",
+      "filter": "筛选",
+      "apply": "应用",
+      "reset": "重置",
+      "category": "分类",
+      "brand": "品牌",
+      "anyCategory": "全部",
+      "anyBrand": "全部",
+      "minPrice": "最低价",
+      "maxPrice": "最高价",
+      "showing": "共 {total} 件",
+      "page": "第 {page} / {pages} 页"
+    },
+    "detail": {
+      "backToList": "返回列表",
+      "brand": "品牌",
+      "condition": "成色",
+      "serial": "编号",
+      "size": "尺寸",
+      "originalPrice": "原价",
+      "soldNote": "如商品当前不可购买，请联系我们了解最新状态。",
+      "inquireCTA": "询价",
+      "favorite": "收藏",
+      "unfavorite": "取消收藏",
+      "certs": "鉴定附件",
+      "descTitle": "商品描述",
+      "noDesc": "暂无描述"
+    },
+    "favorites": {
+      "title": "我的收藏",
+      "empty": "尚未收藏任何商品。",
+      "clearAll": "清空收藏",
+      "removed": "商品已下架，自动清理"
+    },
+    "about": {
+      "title": "关于我们",
+      "intro": "我们是一家专注于二手奢侈品的工作室，所有商品均经资深鉴定师把关。",
+      "trustTitle": "为什么选择我们",
+      "trust": [
+        "经验证：每件商品配真伪鉴定附件",
+        "可议价：透明价格，欢迎沟通",
+        "可追溯：来源清晰，售后无忧"
+      ]
+    },
+    "contact": {
+      "title": "联系我们",
+      "subtitle": "随时通过以下方式联系，我们会尽快回复。",
+      "phone": "电话",
+      "wechat": "微信号",
+      "wechatQr": "微信二维码",
+      "noContact": "联系方式尚未配置。",
+      "formNote": "在线询价将于后续上线，目前请先用上方联系方式。"
+    },
+    "condition": {
+      "NEW": "全新",
+      "LIKE_NEW": "近全新",
+      "EXCELLENT": "极佳",
+      "GOOD": "良好",
+      "FAIR": "一般"
+    }
   }
 }
