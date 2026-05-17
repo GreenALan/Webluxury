@@ -114,14 +114,20 @@ describe('listPublicProducts', () => {
 
   it('按 brand 精确过滤', async () => {
     const r = await listPublicProducts({ brand: 'Rolex' });
-    expect(r.items.map((p) => p.slug)).toEqual(['pub-t-watch-1']);
+    // Scope to this file's fixtures — other parallel test files may also seed Rolex products.
+    const mine = r.items.filter((p) => p.slug.startsWith('pub-t-'));
+    expect(mine.map((p) => p.slug)).toEqual(['pub-t-watch-1']);
   });
 
   it('按 minPrice / maxPrice 过滤', async () => {
     const lo = await listPublicProducts({ minPrice: 50000 });
-    expect(lo.items.map((p) => p.slug)).toEqual(['pub-t-watch-1']);
+    expect(lo.items.filter((p) => p.slug.startsWith('pub-t-')).map((p) => p.slug)).toEqual([
+      'pub-t-watch-1'
+    ]);
     const hi = await listPublicProducts({ maxPrice: 50000 });
-    expect(hi.items.map((p) => p.slug)).toEqual(['pub-t-bag-1']);
+    expect(hi.items.filter((p) => p.slug.startsWith('pub-t-')).map((p) => p.slug)).toEqual([
+      'pub-t-bag-1'
+    ]);
   });
 
   it('分页', async () => {
