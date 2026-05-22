@@ -84,8 +84,7 @@
       "phone": "Phone",
       "wechat": "WeChat ID",
       "wechatQr": "WeChat QR",
-      "noContact": "Contact details not yet configured.",
-      "formNote": "Online inquiries are coming soon. For now, please reach out via the channels above."
+      "noContact": "Contact details not yet configured."
     },
     "inquiry": {
       "openCTA": "Inquire",

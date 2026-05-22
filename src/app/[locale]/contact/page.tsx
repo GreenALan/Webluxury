@@ -1,6 +1,7 @@
 import { setRequestLocale, getTranslations } from 'next-intl/server';
 import { getAllSettings } from '@/lib/settings';
 import { ContactCard } from '@/components/public/ContactCard';
+import { InquiryButton } from '@/components/public/InquiryButton';
 import type { Locale } from '@/i18n/config';
 
 export default async function ContactPage({
@@ -23,7 +24,9 @@ export default async function ContactPage({
           wechatQrUrl={s.contact_wechat_qr_url || undefined}
         />
       </div>
-      <p className="mt-10 text-xs text-ink-soft border-t border-line pt-4">{t('formNote')}</p>
+      <div className="mt-10 border-t border-line pt-6">
+        <InquiryButton variant="outline" />
+      </div>
     </section>
   );
 }

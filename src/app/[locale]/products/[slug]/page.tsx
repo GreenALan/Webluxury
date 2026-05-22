@@ -5,6 +5,7 @@ import { ImageGallery } from '@/components/public/ImageGallery';
 import { PriceTag } from '@/components/public/PriceTag';
 import { ConditionBadge } from '@/components/public/ConditionBadge';
 import { FavoriteButton } from '@/components/public/FavoriteButton';
+import { InquiryButton } from '@/components/public/InquiryButton';
 import { LocaleLink } from '@/components/public/LocaleLink';
 import { pickLocalized } from '@/lib/format';
 import type { Locale } from '@/i18n/config';
@@ -84,12 +85,11 @@ export default async function ProductDetailPage({
           </dl>
 
           <div className="flex flex-wrap gap-3">
-            <LocaleLink
-              href="/contact"
-              className="inline-flex items-center px-6 py-2 bg-ink text-bone text-xs tracking-widest uppercase hover:bg-accent"
-            >
-              {t('inquireCTA')}
-            </LocaleLink>
+            <InquiryButton
+              productId={p.id}
+              productTitle={title}
+              label={t('inquireCTA')}
+            />
             <FavoriteButton productId={p.id} />
           </div>
 

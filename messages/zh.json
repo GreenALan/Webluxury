@@ -84,8 +84,7 @@
       "phone": "电话",
       "wechat": "微信号",
       "wechatQr": "微信二维码",
-      "noContact": "联系方式尚未配置。",
-      "formNote": "在线询价将于后续上线，目前请先用上方联系方式。"
+      "noContact": "联系方式尚未配置。"
     },
     "inquiry": {
       "openCTA": "询价",
