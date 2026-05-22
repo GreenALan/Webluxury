@@ -45,7 +45,7 @@ export async function listInquiriesAdmin(filter: InquiryListFilter) {
       include: {
         product: { select: { id: true, slug: true, titleZh: true, titleEn: true } }
       },
-      orderBy: { createdAt: 'desc' },
+      orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
       skip: (page - 1) * pageSize,
       take: pageSize
     }),

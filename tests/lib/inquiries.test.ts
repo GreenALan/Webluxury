@@ -111,7 +111,6 @@ describe('listInquiriesAdmin', () => {
       productId: null,
       ipHash: 'h'
     });
-    await new Promise((r) => setTimeout(r, 10));
     await createInquiry({
       name: 'inq-t-b',
       contact: 'c',
