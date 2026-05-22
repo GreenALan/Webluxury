@@ -77,6 +77,43 @@ sudo -v   # 输入密码后无报错即可
 > chmod 600 ~/.ssh/authorized_keys
 > ```
 
+### 1.4 防 SSH 断连 + tmux 救命（强烈建议）
+
+部署中 SSH 经常因为 NAT 超时、网络抖动而掉，跑到一半的 `pnpm build` 被杀很闹心。两步杜绝：
+
+**a) 本地 Mac 开 SSH 心跳**，编辑 `~/.ssh/config`（没有就新建）：
+
+```
+Host summit
+  HostName <SERVER_IP>
+  User lvshaohui
+  ServerAliveInterval 30
+  ServerAliveCountMax 10
+  TCPKeepAlive yes
+```
+
+以后 `ssh summit` 直接连，每 30s 一次心跳，运营商 NAT 不再随便切。
+
+**b) 服务器装 tmux**，让会话在 SSH 断后依然存活：
+
+```bash
+sudo apt -y install tmux
+tmux new -s deploy     # 进入名为 deploy 的会话，照原计划继续
+# 如果 ssh 真断了，重新登服务器后：
+tmux attach -t deploy  # 接回去，状态完全保留
+```
+
+常用快捷键（前缀 `Ctrl+B`）：
+
+| 操作 | 按键 |
+|---|---|
+| 主动脱离（不杀进程） | `Ctrl+B` 然后 `d` |
+| 列所有会话 | `tmux ls` |
+| 接回会话 | `tmux attach -t <名字>` 或 `tmux a` |
+| 上下滚屏看历史 | `Ctrl+B` 然后 `[`，方向键浏览，`q` 退出 |
+
+> **建议**：从这里开始的所有命令都跑在 `tmux new -s deploy` 里。中途网断了无所谓，回头 `ssh summit && tmux a` 一秒接回原状态。
+
 ---
 
 ## 2. 安装运行时
