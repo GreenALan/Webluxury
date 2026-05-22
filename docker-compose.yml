@@ -4,13 +4,21 @@ services:
     container_name: luxury-pg
     restart: unless-stopped
     environment:
-      POSTGRES_USER: luxury
-      POSTGRES_PASSWORD: luxury
-      POSTGRES_DB: luxury
+      POSTGRES_USER: ${POSTGRES_USER:-luxury}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-luxury}
+      POSTGRES_DB: ${POSTGRES_DB:-luxury}
     ports:
-      - '5432:5432'
+      # Bind to localhost only so PG is never exposed on the public interface.
+      # On dev machines this still works; on prod servers the host firewall
+      # plus this binding mean only the local app can reach 5432.
+      - '127.0.0.1:5432:5432'
     volumes:
       - luxury-pg-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U $${POSTGRES_USER:-luxury} -d $${POSTGRES_DB:-luxury}']
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 volumes:
   luxury-pg-data:
