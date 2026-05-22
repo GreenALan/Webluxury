@@ -14,7 +14,7 @@ const Body = z.object({
   locale: z.enum(['zh', 'en']),
   productId: z
     .string()
-    .regex(/^c[a-z0-9]{20,}$/i)
+    .regex(/^c[a-z0-9]{20,}$/)
     .optional()
     .nullable()
 });
@@ -35,6 +35,11 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: false, code: 'INVALID_INPUT' }, { status: 400 });
   }
 
+  if (!inquiryLimiter.check(ip)) {
+    logger.warn({ ip }, 'inquiry rate limited');
+    return NextResponse.json({ ok: false, code: 'RATE_LIMITED' }, { status: 429 });
+  }
+
   if (parsed.productId) {
     const product = await prisma.product.findUnique({
       where: { id: parsed.productId },
@@ -43,11 +48,6 @@ export async function POST(req: Request) {
     if (!product || product.status !== 'AVAILABLE') {
       return NextResponse.json({ ok: false, code: 'INVALID_INPUT' }, { status: 400 });
     }
-  }
-
-  if (!inquiryLimiter.check(ip)) {
-    logger.warn({ ip }, 'inquiry rate limited');
-    return NextResponse.json({ ok: false, code: 'RATE_LIMITED' }, { status: 429 });
   }
 
   try {
