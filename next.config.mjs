@@ -8,7 +8,9 @@ const nextConfig = {
   images: {
     remotePatterns: [
       { protocol: 'https', hostname: '*.myqcloud.com' },
-      { protocol: 'https', hostname: '*.cos.ap-shanghai.myqcloud.com' }
+      { protocol: 'https', hostname: '*.cos.ap-shanghai.myqcloud.com' },
+      { protocol: 'https', hostname: 'picsum.photos' },
+      { protocol: 'https', hostname: 'fastly.picsum.photos' }
     ]
   }
 };
