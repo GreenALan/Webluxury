@@ -18,8 +18,21 @@ type DemoProduct = {
   condition: Condition;
   serialNumber?: string;
   sizeInfo?: Record<string, string>;
-  imageSeeds: string[];
+  /**
+   * Each entry is a comma-separated tag list for loremflickr.com.
+   * Demo images come from Flickr CC photos matching the tags — so a Rolex
+   * card actually shows a Rolex photo, etc. Replace with real uploads from
+   * /admin/products/[id]/edit when going to production.
+   */
+  imageTags: string[];
 };
+
+const DEMO_IMAGE_SIZE = 900;
+function demoImageUrl(tags: string, lock: number): string {
+  // `lock` makes the result deterministic per product+slot, so re-seeds don't
+  // shuffle the gallery.
+  return `https://loremflickr.com/${DEMO_IMAGE_SIZE}/${DEMO_IMAGE_SIZE}/${encodeURIComponent(tags)}?lock=${lock}`;
+}
 
 const DEMO_CATEGORIES: DemoCat[] = [
   { slug: 'watch', nameZh: '腕表', nameEn: 'Watches', sortOrder: 1 },
@@ -42,7 +55,7 @@ const DEMO_PRODUCTS: DemoProduct[] = [
     condition: 'EXCELLENT',
     serialNumber: 'L9X12345',
     sizeInfo: { diameter: '41mm', material: '904L 钢' },
-    imageSeeds: ['rolex-sub-1', 'rolex-sub-2', 'rolex-sub-3']
+    imageTags: ['rolex,submariner', 'rolex,watch', 'diver,watch']
   },
   {
     slug: 'rolex-daytona-116500ln-white',
@@ -56,7 +69,7 @@ const DEMO_PRODUCTS: DemoProduct[] = [
     condition: 'LIKE_NEW',
     serialNumber: 'M2K88210',
     sizeInfo: { diameter: '40mm' },
-    imageSeeds: ['rolex-day-1', 'rolex-day-2']
+    imageTags: ['rolex,daytona', 'chronograph,watch']
   },
   {
     slug: 'patek-philippe-nautilus-5711',
@@ -69,7 +82,7 @@ const DEMO_PRODUCTS: DemoProduct[] = [
     price: '320000.00',
     condition: 'EXCELLENT',
     sizeInfo: { diameter: '40mm' },
-    imageSeeds: ['pp-naut-1', 'pp-naut-2']
+    imageTags: ['patek,philippe', 'luxury,watch']
   },
   {
     slug: 'audemars-piguet-royal-oak-15500',
@@ -82,7 +95,7 @@ const DEMO_PRODUCTS: DemoProduct[] = [
     price: '210000.00',
     condition: 'GOOD',
     sizeInfo: { diameter: '41mm' },
-    imageSeeds: ['ap-ro-1', 'ap-ro-2']
+    imageTags: ['audemars,piguet', 'royal,oak,watch']
   },
   {
     slug: 'hermes-birkin-25-togo-etoupe',
@@ -96,7 +109,7 @@ const DEMO_PRODUCTS: DemoProduct[] = [
     originalPrice: '195000.00',
     condition: 'LIKE_NEW',
     sizeInfo: { length: '25cm', width: '13cm', height: '20cm' },
-    imageSeeds: ['birkin-25-1', 'birkin-25-2', 'birkin-25-3']
+    imageTags: ['birkin,bag', 'hermes,handbag', 'leather,handbag']
   },
   {
     slug: 'hermes-kelly-28-epsom-gold',
@@ -109,7 +122,7 @@ const DEMO_PRODUCTS: DemoProduct[] = [
     price: '150000.00',
     condition: 'EXCELLENT',
     sizeInfo: { length: '28cm', width: '10cm', height: '22cm' },
-    imageSeeds: ['kelly-28-1', 'kelly-28-2']
+    imageTags: ['kelly,bag', 'hermes,bag']
   },
   {
     slug: 'lv-monogram-speedy-30',
@@ -122,7 +135,7 @@ const DEMO_PRODUCTS: DemoProduct[] = [
     price: '9800.00',
     originalPrice: '14000.00',
     condition: 'GOOD',
-    imageSeeds: ['lv-speedy-1']
+    imageTags: ['louis,vuitton,bag']
   },
   {
     slug: 'chanel-classic-flap-medium-caviar',
@@ -135,7 +148,7 @@ const DEMO_PRODUCTS: DemoProduct[] = [
     price: '58000.00',
     condition: 'EXCELLENT',
     sizeInfo: { length: '25.5cm', width: '6.5cm', height: '15.5cm' },
-    imageSeeds: ['chanel-cf-1', 'chanel-cf-2']
+    imageTags: ['chanel,bag', 'quilted,handbag']
   },
   {
     slug: 'dior-lady-d-joy-mini',
@@ -147,7 +160,7 @@ const DEMO_PRODUCTS: DemoProduct[] = [
     categorySlug: 'bag',
     price: '42000.00',
     condition: 'LIKE_NEW',
-    imageSeeds: ['dior-ldj-1']
+    imageTags: ['dior,bag']
   },
   {
     slug: 'cartier-love-bracelet-yellow-gold',
@@ -160,7 +173,7 @@ const DEMO_PRODUCTS: DemoProduct[] = [
     price: '48000.00',
     condition: 'EXCELLENT',
     sizeInfo: { size: '17' },
-    imageSeeds: ['cartier-love-1', 'cartier-love-2']
+    imageTags: ['cartier,bracelet', 'gold,bracelet']
   },
   {
     slug: 'vca-alhambra-vintage-necklace',
@@ -172,7 +185,7 @@ const DEMO_PRODUCTS: DemoProduct[] = [
     categorySlug: 'jewelry',
     price: '136000.00',
     condition: 'LIKE_NEW',
-    imageSeeds: ['vca-alhambra-1']
+    imageTags: ['necklace,pearl', 'alhambra,jewelry']
   },
   {
     slug: 'hermes-silk-scarf-90',
@@ -185,7 +198,7 @@ const DEMO_PRODUCTS: DemoProduct[] = [
     price: '2800.00',
     originalPrice: '3650.00',
     condition: 'NEW',
-    imageSeeds: ['hermes-scarf-1']
+    imageTags: ['silk,scarf']
   }
 ];
 
@@ -257,15 +270,29 @@ async function ensureSettings(): Promise<void> {
 }
 
 async function ensureProducts(owner: AdminUser, catBySlug: Map<string, string>): Promise<void> {
+  const refreshImages = process.env.REFRESH_DEMO_IMAGES === '1';
   for (const p of DEMO_PRODUCTS) {
     const categoryId = catBySlug.get(p.categorySlug);
     if (!categoryId) {
       console.warn(`跳过 ${p.slug}：分类 ${p.categorySlug} 不存在`);
       continue;
     }
+    const images = p.imageTags.map((tags, idx) => ({
+      url: demoImageUrl(tags, idx + 1),
+      kind: 'PHOTO' as const,
+      sortOrder: idx
+    }));
     const existing = await prisma.product.findUnique({ where: { slug: p.slug } });
     if (existing) {
-      console.log(`商品 ${p.slug} 已存在，跳过。`);
+      if (refreshImages) {
+        await prisma.image.deleteMany({ where: { productId: existing.id, kind: 'PHOTO' } });
+        await prisma.image.createMany({
+          data: images.map((img) => ({ ...img, productId: existing.id }))
+        });
+        console.log(`商品 ${p.slug} 图片已刷新（REFRESH_DEMO_IMAGES=1）。`);
+      } else {
+        console.log(`商品 ${p.slug} 已存在，跳过。`);
+      }
       continue;
     }
     await prisma.product.create({
@@ -285,13 +312,7 @@ async function ensureProducts(owner: AdminUser, catBySlug: Map<string, string>):
         serialNumber: p.serialNumber ?? null,
         status: 'AVAILABLE',
         uploadedById: owner.id,
-        images: {
-          create: p.imageSeeds.map((seed, idx) => ({
-            url: `https://picsum.photos/seed/${encodeURIComponent(seed)}/900/900`,
-            kind: 'PHOTO' as const,
-            sortOrder: idx
-          }))
-        }
+        images: { create: images }
       }
     });
   }
