@@ -56,20 +56,26 @@ sudo ufw status
 
 **不要**开 5432（数据库端口）给公网——Docker 只绑到本机，但防火墙双保险。
 
-### 1.3 创建应用用户（推荐，避免直接用 root 跑 PM2）
+### 1.3 应用用户（推荐用一个非 root 的 sudo 用户跑 PM2）
+
+本文档假设你用 **`lvshaohui`** 这个普通 sudo 用户登录服务器，所有后续操作都在它的家目录 `/home/lvshaohui` 下进行。如果你的用户名不是这个，把后面所有 `lvshaohui` 替换成你的实际用户名（或在 shell 里 `export DEPLOY_USER=$(whoami)` 然后 `eval` 替换）。
+
+确认这个用户有 sudo 权限：
 
 ```bash
-sudo adduser --disabled-password --gecos "" deploy
-sudo usermod -aG sudo deploy
-# 把你的 ssh key 加给 deploy
-sudo mkdir -p /home/deploy/.ssh
-sudo cp ~/.ssh/authorized_keys /home/deploy/.ssh/
-sudo chown -R deploy:deploy /home/deploy/.ssh
-sudo chmod 700 /home/deploy/.ssh
-sudo chmod 600 /home/deploy/.ssh/authorized_keys
+sudo -v   # 输入密码后无报错即可
 ```
 
-之后用 `ssh deploy@${SERVER_IP}` 登。
+> **如果当前是用密码 SSH 登的**，建议先把本地 Mac 的公钥加进 `~/.ssh/authorized_keys`，以后免密：
+>
+> 本地 Mac：`cat ~/.ssh/id_ed25519.pub`（没有的话先 `ssh-keygen -t ed25519`）。复制输出。
+>
+> 服务器：
+> ```bash
+> install -d -m 700 ~/.ssh
+> echo '<粘贴公钥>' >> ~/.ssh/authorized_keys
+> chmod 600 ~/.ssh/authorized_keys
+> ```
 
 ---
 
@@ -99,11 +105,11 @@ echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.
   sudo tee /etc/apt/sources.list.d/docker.list >/dev/null
 sudo apt update && sudo apt -y install docker-ce docker-ce-cli containerd.io docker-compose-plugin
 
-# 让 deploy 用户能用 docker，不必 sudo
-sudo usermod -aG docker deploy
+# 让当前用户能用 docker，不必 sudo
+sudo usermod -aG docker lvshaohui
 # 退出 ssh 重连一次让 group 生效
 exit
-ssh deploy@${SERVER_IP}
+ssh lvshaohui@${SERVER_IP}
 docker ps   # 应该不报权限错
 ```
 
@@ -127,13 +133,13 @@ pm2 -v
 ## 3. 拉代码
 
 ```bash
-cd /home/deploy
+cd ~              # /home/lvshaohui
 git clone <你的仓库 URL> luxury
 # 如果是私有 repo：先 ssh-keygen 生成 key，把 pub key 加到 GitHub/GitLab 部署密钥
 cd luxury
 ```
 
-`cd /home/deploy/luxury` 是后面所有 `pnpm/pm2` 命令的工作目录。
+`~/luxury`（也就是 `/home/lvshaohui/luxury`）是后面所有 `pnpm/pm2` 命令的工作目录。
 
 ---
 
@@ -234,7 +240,7 @@ pnpm build                           # 生成 .next/
 创建启动配置 `ecosystem.config.cjs`（项目根目录新建）：
 
 ```bash
-nano /home/deploy/luxury/ecosystem.config.cjs
+nano /home/lvshaohui/luxury/ecosystem.config.cjs
 ```
 
 粘进去：
@@ -246,15 +252,15 @@ module.exports = {
       name: 'luxury',
       script: 'node_modules/next/dist/bin/next',
       args: 'start --port 3000',
-      cwd: '/home/deploy/luxury',
+      cwd: '/home/lvshaohui/luxury',
       instances: 1,
       autorestart: true,
       max_memory_restart: '500M',
       env: {
         NODE_ENV: 'production'
       },
-      out_file: '/home/deploy/luxury/logs/out.log',
-      error_file: '/home/deploy/luxury/logs/err.log',
+      out_file: '/home/lvshaohui/luxury/logs/out.log',
+      error_file: '/home/lvshaohui/luxury/logs/err.log',
       merge_logs: true,
       time: true
     }
@@ -265,7 +271,7 @@ module.exports = {
 启动：
 
 ```bash
-mkdir -p /home/deploy/luxury/logs
+mkdir -p /home/lvshaohui/luxury/logs
 pm2 start ecosystem.config.cjs
 pm2 status        # 应看到 luxury 状态 online
 pm2 logs luxury --lines 50   # Ctrl+C 退出
@@ -281,7 +287,7 @@ curl -I http://localhost:3000   # 应返回 200 或 307（语言重定向）
 
 ```bash
 pm2 save
-pm2 startup systemd -u deploy --hp /home/deploy
+pm2 startup systemd -u lvshaohui --hp /home/lvshaohui
 # 会输出一行 sudo 命令，照抄执行
 ```
 
@@ -327,7 +333,7 @@ server {
 
   # 本地上传图片直接由 Nginx 出，绕过 Node
   location /uploads/ {
-    alias /home/deploy/luxury/public/uploads/;
+    alias /home/lvshaohui/luxury/public/uploads/;
     access_log off;
     expires 30d;
     add_header Cache-Control "public, max-age=2592000";
@@ -335,7 +341,7 @@ server {
 
   # 静态资源缓存
   location /_next/static/ {
-    alias /home/deploy/luxury/.next/static/;
+    alias /home/lvshaohui/luxury/.next/static/;
     access_log off;
     expires 365d;
     add_header Cache-Control "public, immutable, max-age=31536000";
@@ -419,7 +425,7 @@ sudo certbot renew --dry-run
 服务器上：
 
 ```bash
-cd /home/deploy/luxury
+cd /home/lvshaohui/luxury
 git pull
 pnpm install --frozen-lockfile
 pnpm prisma migrate deploy    # 有新迁移才会跑
@@ -432,13 +438,13 @@ pm2 restart luxury
 ### 简单备份脚本（可选）
 
 ```bash
-nano /home/deploy/backup-db.sh
+nano /home/lvshaohui/backup-db.sh
 ```
 
 ```bash
 #!/usr/bin/env bash
 set -euo pipefail
-DEST=/home/deploy/backups
+DEST=/home/lvshaohui/backups
 mkdir -p "$DEST"
 NAME="luxury-$(date +%Y%m%d-%H%M).sql.gz"
 docker exec luxury-pg pg_dump -U luxury luxury | gzip > "$DEST/$NAME"
@@ -447,14 +453,14 @@ ls -1t "$DEST"/luxury-*.sql.gz | tail -n +15 | xargs -r rm
 ```
 
 ```bash
-chmod +x /home/deploy/backup-db.sh
+chmod +x /home/lvshaohui/backup-db.sh
 crontab -e
 ```
 
 加一行（每天凌晨 3:30 备份）：
 
 ```
-30 3 * * * /home/deploy/backup-db.sh >> /home/deploy/logs/backup.log 2>&1
+30 3 * * * /home/lvshaohui/backup-db.sh >> /home/lvshaohui/logs/backup.log 2>&1
 ```
 
 恢复：`gunzip -c <file>.sql.gz | docker exec -i luxury-pg psql -U luxury luxury`。
@@ -469,10 +475,10 @@ crontab -e
 | 502 但 PM2 显示 online | `curl -I http://localhost:3000` 看 Next 自己是否响应 | 看 `pm2 logs`，常是 DATABASE_URL 写错或 PG 没起来 |
 | `pnpm build` 失败 OOM | 1GB 内存的小机器会爆 | 加 swap：`fallocate -l 2G /swapfile && chmod 600 /swapfile && mkswap /swapfile && swapon /swapfile`（追加到 `/etc/fstab`） |
 | `pnpm prisma migrate deploy` 报错 | DB 连不上 | `docker compose ps` 看容器；`docker exec -it luxury-pg psql -U luxury -d luxury -c '\l'` 验证 |
-| 图片上传报错 / 看不到 | `public/uploads/` 写权限 | `sudo chown -R deploy:deploy public/uploads/ && chmod 755 public/uploads/` |
+| 图片上传报错 / 看不到 | `public/uploads/` 写权限 | `sudo chown -R lvshaohui:lvshaohui public/uploads/ && chmod 755 public/uploads/` |
 | Nginx 改完不生效 | `sudo nginx -t` 是否通过 | 通过后 `sudo systemctl reload nginx` |
 | 证书续期失败 | `sudo certbot certificates` 看到期日 | `sudo certbot renew --force-renewal` |
-| 管理员密码忘了 | 找回路径 | 服务器跑：`cd /home/deploy/luxury && node -e "const{PrismaClient}=require('@prisma/client');const b=require('bcryptjs');(async()=>{const p=new PrismaClient();await p.adminUser.update({where:{email:'<owner email>'},data:{passwordHash:await b.hash('<new pw>',12)}});await p.\$disconnect()})()"` |
+| 管理员密码忘了 | 找回路径 | 服务器跑：`cd /home/lvshaohui/luxury && node -e "const{PrismaClient}=require('@prisma/client');const b=require('bcryptjs');(async()=>{const p=new PrismaClient();await p.adminUser.update({where:{email:'<owner email>'},data:{passwordHash:await b.hash('<new pw>',12)}});await p.\$disconnect()})()"` |
 
 ---
 
@@ -490,13 +496,13 @@ crontab -e
 ## 速查
 
 ```
-应用根目录:        /home/deploy/luxury
-日志:              /home/deploy/luxury/logs/{out,err}.log
+应用根目录:        /home/lvshaohui/luxury
+日志:              /home/lvshaohui/luxury/logs/{out,err}.log
 PM2 状态:          pm2 status
 PG 连进去看:       docker exec -it luxury-pg psql -U luxury luxury
 Nginx 配置:        /etc/nginx/sites-available/luxury
 SSL 证书:          /etc/letsencrypt/live/<domain>/
-环境变量:          /home/deploy/luxury/.env  （chmod 600）
+环境变量:          /home/lvshaohui/luxury/.env  （chmod 600）
 重启应用:          pm2 restart luxury
 重启 Nginx:        sudo systemctl reload nginx
 重启 PG:           docker compose restart
