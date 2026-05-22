@@ -96,8 +96,8 @@ sudo apt update
 sudo apt -y install nodejs
 node -v   # 应该是 v20.x
 
-sudo corepack enable
-sudo corepack prepare pnpm@10.25.0 --activate
+# pnpm —— 直接走 npm，不用 corepack（NodeSource 部分 Debian 构建不带 corepack）
+sudo npm install -g pnpm@10.25.0
 pnpm -v   # 应该是 10.25.0
 ```
 
