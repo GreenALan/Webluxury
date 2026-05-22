@@ -87,6 +87,27 @@
       "noContact": "Contact details not yet configured.",
       "formNote": "Online inquiries are coming soon. For now, please reach out via the channels above."
     },
+    "inquiry": {
+      "openCTA": "Inquire",
+      "openGeneral": "Send a message",
+      "title": "Send inquiry",
+      "titleGeneral": "Send a message",
+      "name": "Name",
+      "namePlaceholder": "How to address you",
+      "contact": "Contact",
+      "contactPlaceholder": "Phone / WeChat ID",
+      "message": "Message",
+      "messagePlaceholder": "Briefly describe what you'd like to know",
+      "submit": "Submit",
+      "submitting": "Submitting…",
+      "cancel": "Cancel",
+      "successTitle": "Received",
+      "successBody": "We will get back to you via the contact you provided.",
+      "errorGeneric": "Submission failed, please try again later.",
+      "errorInvalid": "Please review the form and try again.",
+      "errorRateLimited": "Too many submissions, please wait a few minutes.",
+      "productLabel": "Inquiring about"
+    },
     "condition": {
       "NEW": "New",
       "LIKE_NEW": "Like New",

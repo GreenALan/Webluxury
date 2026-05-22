@@ -87,6 +87,27 @@
       "noContact": "联系方式尚未配置。",
       "formNote": "在线询价将于后续上线，目前请先用上方联系方式。"
     },
+    "inquiry": {
+      "openCTA": "询价",
+      "openGeneral": "提交咨询",
+      "title": "提交询价",
+      "titleGeneral": "提交咨询",
+      "name": "称呼",
+      "namePlaceholder": "您的称呼",
+      "contact": "联系方式",
+      "contactPlaceholder": "电话 / 微信号",
+      "message": "留言",
+      "messagePlaceholder": "请简单描述您的需求或想确认的细节",
+      "submit": "提交",
+      "submitting": "提交中…",
+      "cancel": "取消",
+      "successTitle": "已收到",
+      "successBody": "我们会尽快通过您留下的联系方式回复。",
+      "errorGeneric": "提交失败，请稍后再试。",
+      "errorInvalid": "请检查表单后再试。",
+      "errorRateLimited": "提交过于频繁，请稍后再试。",
+      "productLabel": "询问商品"
+    },
     "condition": {
       "NEW": "全新",
       "LIKE_NEW": "近全新",
