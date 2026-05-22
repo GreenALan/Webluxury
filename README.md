@@ -5,6 +5,7 @@
 **M1**：脚手架 + 双语 i18n + 移动端为主的公开站点骨架 + 后台登录 + JWT 鉴权。
 **M2**：后台完整 CRUD（商品/分类/Settings/Users + 图片上传）。
 **M3**：公开站点（首页 / 商品列表 + 筛选 / 商品详情 / 收藏夹 / 关于 / 联系）。
+**M4**：在线询价（弹窗+表单+`/api/inquiries`+`/admin/inquiries`，按 IP 限流）。
 
 ## 本地开发
 
@@ -57,4 +58,4 @@ pnpm dev
 - `.env` 必须存在且含有效 `DATABASE_URL` 和 `JWT_SECRET`。Prisma CLI 默认只读 `.env`（不读 `.env.local`）。
 - **公开站点路径**：`/zh`（默认）、`/en`。商品详情 `/[locale]/products/[slug]`。
 - **收藏夹**：纯客户端 localStorage（key=`lr_favorites`），无服务端账号。
-- **询价**：M3 联系页只展示联系方式；在线询价（弹窗+表单+`/api/inquiries`+`/admin/inquiries`）属 M4。
+- **询价**：访客在商品详情或联系页打开弹窗提交。同 IP 5 分钟最多 3 次；后台 `/admin/inquiries` 查看与处理。
