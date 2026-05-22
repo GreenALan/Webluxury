@@ -6,6 +6,7 @@ const ITEMS = [
   { href: '/admin', label: '仪表盘', exact: true },
   { href: '/admin/products', label: '商品' },
   { href: '/admin/categories', label: '分类' },
+  { href: '/admin/inquiries', label: '询价' },
   { href: '/admin/users', label: '管理员' },
   { href: '/admin/settings', label: '设置' }
 ];
