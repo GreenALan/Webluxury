@@ -83,10 +83,19 @@ sudo -v   # 输入密码后无报错即可
 
 ### 2.1 Node 20 + pnpm
 
+NodeSource 的 `setup_20.x` 一键脚本最近版本会误判 apt update 失败（实际成功了），**手动加仓库更稳**：
+
 ```bash
-curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+sudo apt -y install ca-certificates curl gnupg
+sudo mkdir -p /etc/apt/keyrings
+curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | \
+  sudo gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg
+echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_20.x nodistro main" | \
+  sudo tee /etc/apt/sources.list.d/nodesource.list
+sudo apt update
 sudo apt -y install nodejs
 node -v   # 应该是 v20.x
+
 sudo corepack enable
 sudo corepack prepare pnpm@10.25.0 --activate
 pnpm -v   # 应该是 10.25.0
