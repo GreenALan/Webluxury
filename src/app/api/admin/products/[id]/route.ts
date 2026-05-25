@@ -21,7 +21,8 @@ const Body = z
     brand: z.string().min(1).max(60),
     categoryId: z.string().min(1),
     price: z.string().regex(/^\d+(\.\d{1,2})?$/),
-    originalPrice: z.string().regex(/^\d+(\.\d{1,2})?$/),
+    // Empty string = "no original price" (clear the column). Form sends '' when the input is blank.
+    originalPrice: z.string().regex(/^\d+(\.\d{1,2})?$|^$/),
     condition: z.enum(['NEW', 'LIKE_NEW', 'EXCELLENT', 'GOOD', 'FAIR']),
     sizeInfo: z.record(z.string(), z.string()),
     serialNumber: z.string().max(120),
@@ -43,8 +44,9 @@ export async function PATCH(req: Request, ctx: Ctx) {
   let parsed;
   try {
     parsed = Body.parse(await req.json());
-  } catch {
-    return NextResponse.json({ ok: false, code: 'INVALID_INPUT' }, { status: 400 });
+  } catch (e) {
+    const issues = e instanceof z.ZodError ? e.issues : undefined;
+    return NextResponse.json({ ok: false, code: 'INVALID_INPUT', issues }, { status: 400 });
   }
 
   const data: Prisma.ProductUpdateInput = {};
@@ -56,7 +58,7 @@ export async function PATCH(req: Request, ctx: Ctx) {
   if (parsed.categoryId !== undefined) data.category = { connect: { id: parsed.categoryId } };
   if (parsed.price !== undefined) data.price = new Prisma.Decimal(parsed.price);
   if (parsed.originalPrice !== undefined)
-    data.originalPrice = new Prisma.Decimal(parsed.originalPrice);
+    data.originalPrice = parsed.originalPrice === '' ? null : new Prisma.Decimal(parsed.originalPrice);
   if (parsed.condition !== undefined) data.condition = parsed.condition;
   if (parsed.sizeInfo !== undefined) data.sizeInfo = parsed.sizeInfo;
   if (parsed.serialNumber !== undefined) data.serialNumber = parsed.serialNumber;
